@@ -1,0 +1,17 @@
+{% component nav_menu(items, css_class = "") %}
+{%- if items %}
+    <ul class="nav-menu {{ css_class }}">
+        {%- for item in items %}
+            {%- set is_external = item.url is starting_with(pat="http") or item.url is starting_with(pat="//") %}
+            {%- set is_raw_link = is_external or item.url is starting_with(pat="#") or item.url is starting_with(pat="mailto:") %}
+            <li>
+                {%- if is_raw_link %}
+                <a href="{{ item.url | safe }}" {% if is_external %}target="_blank" rel="noopener"{% endif %}>{{ item.name }}</a>
+                {%- else %}
+                <a href="{{ get_url(path=item.url) }}">{{ item.name }}</a>
+                {%- endif %}
+            </li>
+        {%- endfor %}
+    </ul>
+{%- endif %}
+{% endcomponent nav_menu %}

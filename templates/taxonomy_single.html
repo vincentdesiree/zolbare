@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% block content %}
+
+{% if taxonomy.name == "series" %}
+    {% set sorted_pages = term.pages | sort(attribute="extra.order") %}
+{% else %}
+    {% set sorted_pages = term.pages | sort(attribute="date") | reverse %}
+{% endif %}
+
+{% if paginator %}
+    {% set start = (paginator.current_index - 1) * paginator.paginate_by %}
+    {% set end = start + paginator.paginate_by %}
+    {% set displayed_pages = sorted_pages[start:end] %}
+{% else %}
+    {% set displayed_pages = sorted_pages %}
+{% endif %}
+
+<section class="taxonomy-single-page">
+    <header class="section-header">
+        <h1>{{ taxonomy.name | capitalize }} : {{ term.name }}</h1>
+        <p class="section-description">
+            {{ term.page_count }} article{% if term.page_count != 1 %}s{% endif %}
+        </p>
+    </header>
+
+    {% if taxonomy.name == "series" %}
+    <ul class="item-list series-list">
+        {% for page in displayed_pages %}
+        <li class="item-card">
+            <span class="series-order">{{ page.extra.order }}.</span>
+            <div class="series-content">
+                <a href="{{ page.permalink | safe }}" class="item-title">
+                    {{ page.title }}
+                </a>
+                {% if page.description %}
+                <p class="item-description">{{ page.description }}</p>
+                {% endif %}
+            </div>
+        </li>
+        {% endfor %}
+    </ul>
+    {% else %}
+    {% set date_format = config.extra.date_format | default(value="%Y-%m-%d") %}
+    <ul class="item-list taxonomy-articles">
+        {% for page in displayed_pages %}
+        <li class="item-card">
+            <a href="{{ page.permalink | safe }}" class="item-title">
+                {{ page.title }}
+            </a>
+            <span class="item-dates">
+                {% if page.date %}
+                <time datetime="{{ page.date }}">{{ page.date | date(format=date_format) }}</time>
+                {% endif %}
+                {% if page.updated and page.updated != page.date %}
+                <span class="updated-date">
+                    · Upd {{ page.updated | date(format=date_format) }}
+                </span>
+                {% endif %}
+            </span>
+        </li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+
+    {% if paginator %}
+        {{ <paginator paginator={paginator} /> }}
+    {% endif %}
+</section>
+{% endblock content %}

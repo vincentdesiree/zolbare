@@ -1,0 +1,21 @@
+{% component paginator(paginator) %}
+{% if paginator.number_pagers > 1 %}
+<nav class="pagination" aria-label="Pagination">
+    {% if paginator.previous %}
+        <a href="{{ paginator.previous }}">← Previous</a>
+    {% endif %}
+
+    {% for pager in range(start=1, end=paginator.number_pagers + 1) %}
+        {% if pager == paginator.current_index %}
+            <span class="current-page" aria-current="page">{{ pager }}</span>
+        {% else %}
+            <a href="{{ paginator.first }}{% if pager > 1 %}page/{{ pager }}/{% endif %}">{{ pager }}</a>
+        {% endif %}
+    {% endfor %}
+
+    {% if paginator.next %}
+        <a href="{{ paginator.next }}">Next →</a>
+    {% endif %}
+</nav>
+{% endif %}
+{% endcomponent paginator %}

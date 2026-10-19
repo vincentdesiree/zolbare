@@ -1,0 +1,27 @@
+
+name: CI
+
+on:
+  push:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Zola
+        run: |
+          curl -fsSL https://github.com/getzola/zola/releases/download/v0.23.4/zola-v0.23.4-x86_64-unknown-linux-gnu.tar.gz \
+            -o /tmp/zola.tar.gz
+          tar -xzf /tmp/zola.tar.gz -C /tmp
+          sudo install /tmp/zola /usr/local/bin/zola
+
+      - run: zola check --skip-external-links
+      - run: zola build

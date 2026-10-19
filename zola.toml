@@ -1,0 +1,59 @@
+base_url = "https://example.com"
+title = "Zolbare"
+description = "A lightweight, no-bloat Zola theme focused on content."
+author = "Vincent Désirée"
+default_language = "en"
+
+generate_feeds = true
+feed_filenames = ["atom.xml"]
+
+compile_sass = false
+build_search_index = false
+
+taxonomies = [
+  { name = "tags", feed_filename = "tags.xml", paginate_by = 25 },
+  { name = "series", feed_filename = "series.xml", paginate_by = 10 },
+]
+
+[markdown]
+lazy_async_image = true
+bottom_footnotes = true
+render_emoji = true
+external_links_target_blank = true
+external_links_no_follow = false
+external_links_no_referrer = false
+smart_punctuation = true
+
+[markdown.highlighting]
+light_theme = "catppuccin-latte"
+dark_theme = "github-dark"
+error_on_missing_language = false
+
+[extra]
+title_separator = " | "
+title_complement = "Minimal Zola Theme"
+
+favicon_svg = "favicon.svg"
+favicon_png = "favicon.png"
+apple_touch_icon = "apple-touch-icon.png"
+og_image = "og_image.png"
+
+menu = [
+  { name = "Showcase", url = "/showcase" },
+  { name = "Docs", url = "/docs" },
+  { name = "Tags", url = "/tags" },
+  { name = "Series", url = "/series" },
+  { name = "Repo", url = "https://github.com/vincentdesiree/zolbare"},
+  { name = "Demo", url = "https://zolbare.vincentdesiree.com"},
+]
+
+footer_menu = [
+  { name = "About", url = "/about" },
+  { name = "Privacy", url = "/privacy" },
+  { name = "Atom Feed", url = "atom.xml" }
+]
+
+header_hr = true
+footer_hr = true
+
+# Put all your custom variables here

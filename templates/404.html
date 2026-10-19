@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="error-page">
+    <h1>404</h1>
+    <p>Page not found.</p>
+    <p><a href="{{ config.base_url | safe }}">Return to home page</a></p>
+</section>
+{% endblock content %}

@@ -1,0 +1,146 @@
+{% if paginator and paginator.current_index > 1 %}
+    {% set page_nb_title = " - Page" ~ paginator.current_index %}
+{% endif %}
+{% if page and page.title %}
+    {% set meta_title = page.title ~ page_nb_title ~ config.extra.title_separator ~ config.title %}
+{% elif section and section.title %}
+    {% set meta_title = section.title ~ page_nb_title ~ config.extra.title_separator ~ config.title %}
+{% else %}
+    {% set meta_title = config.title ~ page_nb_title ~ config.extra.title_separator ~ config.extra.title_complement %}
+{% endif %}
+
+{% if page and page.description %}
+    {% set meta_description = page.description %}
+{% elif section and section.description %}
+    {% set meta_description = section.description %}
+{% else %}
+    {% set meta_description = config.description %}
+{% endif %}
+
+{% if page and page.extra.og_image %}
+    {% set og_img = page.extra.og_image %}
+{% elif section and section.extra.og_image %}
+    {% set og_img = section.extra.og_image %}
+{% else %}
+    {% set og_img = config.extra.og_image %}
+{% endif %}
+
+{% if page and page.lang %}
+    {% set lang = page.lang %}
+{% elif section and section.lang %}
+    {% set lang = section.lang %}
+{% else %}
+    {% set lang = config.default_language |default(value="en") %}
+{% endif %}
+
+{% if page and page.authors %}
+    {% set author =  page.authors | join(sep=", ")  %}
+{% elif config.author %}
+    {% set author = config.author %}
+{% endif %}
+
+<!doctype html>
+<html lang="{{ lang }}">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+        <title>{{ meta_title }}</title>
+        <meta name="description" content="{{ meta_description }}" />
+        {% if author %}
+        <meta name="author" content="{{ author }}" />
+        <meta property="article:author" content="{{ author }}">
+        {% endif %}
+        <link rel="canonical" href="{{ current_url | default(value=config.base_url) | safe }}" />
+
+        <!-- Open Graph metadata -->
+        <meta property="og:site_name" content="{{ config.title }}" />
+        <meta property="og:title" content="{{ meta_title }}" />
+        <meta property="og:description" content="{{ meta_description }}" />
+        <meta property="og:url" content="{{ current_url | default(value=config.base_url) | safe }}" />
+        <meta property="og:type" content="{% if page %}article{% else %}website{% endif %}" />
+        {%- if og_img %}
+        <meta property="og:image" content="{{ get_url(path=og_img) }}" />
+        <meta name="twitter:card" content="summary_large_image" />
+        {%- else %}
+        <meta name="twitter:card" content="summary" />
+        {%- endif %}
+
+        <!-- Favicons -->
+        {%- if config.extra.favicon_svg %}
+        <link rel="icon" type="image/svg+xml" href="{{ get_url(path=config.extra.favicon_svg) }}" />
+        {%- endif %}
+        {%- if config.extra.favicon_png %}
+        <link rel="icon" type="image/png" sizes="32x32" href="{{ get_url(path=config.extra.favicon_png) }}" />
+        {%- endif %}
+        {%- if config.extra.apple_touch_icon %}
+        <link rel="apple-touch-icon" sizes="180x180" href="{{ get_url(path=config.extra.apple_touch_icon) }}" />
+        {%- endif %}
+
+        <!-- Atom feed -->
+        {%- if config.generate_feeds %}
+          {%- for feed_file in config.feed_filenames %}
+            {%- if feed_file == "atom.xml" %}
+              {%- set feed_type = "application/atom+xml" %}
+            {%- else %}
+              {%- set feed_type = "application/rss+xml" %}
+            {%- endif %}
+            <link rel="alternate" type="{{ feed_type }}" title="{{ config.title }}" href="{{ get_url(path=feed_file) }}" />
+          {%- endfor %}
+        {%- endif %}
+
+        <!-- Main stylesheet -->
+        <link rel="stylesheet" href="{{ get_url(path='style.css') }}" />
+
+        <!-- Head's hook -->
+        {% block extra_head %}{% endblock extra_head %}
+    </head>
+    <body>
+        <a href="#content" class="sr-only">Go to main content</a>
+        <header class="site-header">
+            <nav class="nav-container" aria-label="Header navigation">
+                <a href="{{ config.base_url | safe }}" class="site-title">
+                    <strong>{{ config.title }}</strong>
+                </a>
+
+                {%- if config.extra.menu %}
+                <input type="checkbox" id="nav-toggle" class="nav-toggle">
+                <label for="nav-toggle" class="menu-toggle">
+                    Menu
+                </label>
+                <div class="nav-content">
+                    {{ <nav_menu items={config.extra.menu} /> }}
+                    {% include "partials/search.html" %}
+                </div>
+                {%- endif %}
+            </nav>
+            {% if config.extra.header_hr %}<hr>{%- endif %}
+        </header>
+
+        <main id="content" class="main-container">
+            {% block content %}{% endblock content %}
+        </main>
+
+        <footer class="site-footer">
+            {% if config.extra.footer_hr %}<hr />{%- endif %}
+
+            {%- if config.extra.footer_menu %}
+            <nav class="nav-container" aria-label="Footer links">
+            {{ <nav_menu items={config.extra.footer_menu} /> }}
+            </nav>
+            {%- endif %}
+
+            <p class="copyright">
+                <small>
+                    &copy; {{ now() | date(format="%Y") }} {{ config.author | default(value=config.title) }}.
+                    Built with <a href="https://www.getzola.org/" target="_blank" rel="noopener">Zola</a>
+                    {%- if config.extra.show_theme_credit | default(value=true) %}
+                        &middot; Theme <a href="{{ config.extra.theme_url | default(value="https://github.com/vincentdesiree/zolbare") }}" target="_blank" rel="noopener">Zolbare</a>
+                    {%- endif %}.
+                </small>
+            </p>
+        </footer>
+        <!-- Footer's hook -->
+        {% block extra_footer %}{% endblock extra_footer %}
+    </body>
+</html>

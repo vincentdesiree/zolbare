@@ -1,0 +1,146 @@
+{% extends "base.html" %}
+
+{% block content %}
+{% set date_format = config.extra.date_format | default(value="%Y-%m-%d") %}
+
+{% set show_authors = page.extra.show_authors | default(value=true) %}
+{% set show_dates = page.extra.show_dates | default(value=true) %}
+{% set show_reading_time = page.extra.show_reading_time | default(value=true) %}
+{% set show_toc = page.toc and (page.extra.show_toc | default(value=true)) %}
+{% set show_series = page.taxonomies.series and (page.extra.show_series | default(value=true)) %}
+
+{% set has_sidebar = show_toc or page.extra.widgets or show_series %}
+
+<article class="page-container">
+    <header class="article-header">
+        <h1 class="article-title">{{ page.title }}</h1>
+
+        <div class="article-meta">
+            {% if show_authors and page.authors %}
+            <span class="article-authors">
+                {{ page.authors | join(sep=", ") }}
+            </span>
+            {% elif show_authors and config.author %}
+            <span class="article-authors">{{ config.author }}</span>
+            {% endif %}
+
+            {% if show_dates and page.date %}
+            <time datetime="{{ page.date }}">
+                {{ page.date | date(format=date_format) }}
+            </time>
+            {% endif %}
+
+            {% if show_dates and page.updated and page.updated != page.date %}
+            <span class="updated-date">
+                Updated:
+                <time datetime="{{ page.updated }}">
+                    {{ page.updated | date(format=date_format) }}
+                </time>
+            </span>
+            {% endif %}
+
+            {% if show_reading_time and page.reading_time %}
+            <span class="reading-time">Read time: {{ page.reading_time }} min</span>
+            {% endif %}
+        </div>
+        {% if show_toc %}
+        {{ <toc_widget toc={page.toc} mobile={true} />}}
+        {% endif %}
+    </header>
+
+    <div class="article-layout{% if has_sidebar %} has-sidebar{% endif %}">
+        <div class="article-content">
+            {{ page.content | safe }}
+        </div>
+
+        {% if has_sidebar %}
+        <aside class="article-sidebar" aria-label="Index and links">
+
+            {% if show_toc %}
+            {{ <toc_widget toc={page.toc} />}}
+            {% endif %}
+
+            {% if page.extra.widgets %}
+                {% for widget in page.extra.widgets %}
+                <section class="widget">
+                    <h2 class="widget-title">{{ widget.title }}</h2>
+                    <ul class="widget-links">
+                        {% for item in widget.items %}
+                        <li>
+                            <a href="{{ item.url }}" {% if item.out %} target="_blank"{% endif %}>{{ item.name }}</a>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </section>
+                {% endfor %}
+            {% endif %}
+
+            {% if show_series %}
+                {% for series in page.taxonomies.series %}
+                    {% set series_term = get_taxonomy_term(kind="series", term=series) %}
+                    {% if series_term.page_count > 1 %}
+                    {% set series_pages = series_term.pages | sort(attribute="extra.order") %}
+                    <nav class="widget series-widget" aria-label="More from this serie">
+                        <h2 class="widget-title">
+                            Serie : <a href="{{ get_taxonomy_url(kind="series", term=series) }}">{{ series }}</a>
+                        </h2>
+                        <ul class="series-links">
+                            {% for series_page in series_pages %}
+                                {% if series_page.permalink != page.permalink %}
+                                <li>
+                                    <a href="{{ series_page.permalink | safe }}">
+                                        {{ series_page.extra.order }}. {{ series_page.title }}
+                                    </a>
+                                </li>
+                                {% else %}
+                                <li class="current-series-item" aria-current="page">
+                                    {{ series_page.extra.order }}. {{ series_page.title }}
+                                    <span class="sr-only">(article actuel)</span>
+                                </li>
+                                {% endif %}
+                            {% endfor %}
+                        </ul>
+                    </nav>
+                    {% endif %}
+                {% endfor %}
+            {% endif %}
+
+        </aside>
+        {% endif %}
+    </div>
+
+    {% if page.taxonomies.tags or page.taxonomies.series %}
+    <footer class="article-footer">
+
+        {% if page.taxonomies.tags %}
+        <div class="article-taxonomy">
+            <span class="taxonomy-label">Tags :</span>
+            <ul class="tag-list">
+                {% for tag in page.taxonomies.tags %}
+                <li>
+                    <a href="{{ get_taxonomy_url(kind="tags", term=tag) }}" class="tag-badge">{{ tag }}</a>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+
+        {% if page.taxonomies.series %}
+        <div class="article-taxonomy">
+            <span class="taxonomy-label">Serie :</span>
+            <ul class="tag-list">
+                {% for series in page.taxonomies.series %}
+                <li>
+                    <a href="{{ get_taxonomy_url(kind="series", term=series) }}" class="tag-badge">
+                        {{ series }}
+                    </a>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+
+    </footer>
+    {% endif %}
+</article>
+{% endblock content %}

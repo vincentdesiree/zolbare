@@ -1,0 +1,28 @@
+{% component toc_widget(toc, mobile = false) %}
+{% if mobile %}
+<details class="widget {% if mobile %}toc-mobile{% else %}toc-desktop{% endif %}">
+    <summary>Index</summary>
+{% endif %}
+<nav class="widget {% if mobile %}toc-mobile{% else %}toc-desktop{% endif %}" aria-label="Index">
+    {% if not mobile %}<h2 class="widget-title">Index</h2>{% endif %}
+    <ul class="toc-list">
+        {% for h1 in toc %}
+        <li>
+            <a href="{{ h1.permalink | safe }}">{{ h1.title }}</a>
+            {% if h1.children %}
+            <ul>
+                {% for h2 in h1.children %}
+                <li>
+                    <a href="{{ h2.permalink | safe }}">{{ h2.title }}</a>
+                </li>
+                {% endfor %}
+            </ul>
+            {% endif %}
+        </li>
+        {% endfor %}
+    </ul>
+</nav>
+{% if mobile %}
+</details>
+{% endif %}
+{% endcomponent toc_widget %}}

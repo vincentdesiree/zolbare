@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="section-container">
+    {% block section_header %}
+    {% if section.title or section.desc%}
+    <header class="section-header">
+        {% if section.title %}
+        <h1>{{ section.title }}</h1>
+        {% endif %}
+
+        {% if section.description %}
+        <p class="section-description">{{ section.description }}</p>
+        {% endif %}
+    </header>
+    {% endif %}
+    {% endblock section_header %}
+
+    {% block section_content %}
+    {% set skip_content = paginator and paginator.current_index > 1 %}
+    {% if section.content and not skip_content %}
+    <div class="section-content">
+        {{ section.content | safe }}
+    </div>
+    {% endif %}
+    {% endblock section_content %}
+
+    {% if paginator %}
+        {% set pages = paginator.pages %}
+    {% else %}
+        {% set pages = section.pages %}
+    {% endif %}
+
+    {% if pages %}
+    <section class="posts-list">
+        <ul class="item-list">
+            {% for page in pages %}
+            <li class="item-card">
+                {{ <list_article config={config} section={section} page={page} />}}
+            </li>
+            {% endfor %}
+        </ul>
+
+        {% if paginator %}
+        {{ <paginator paginator={paginator} /> }}
+        {% endif %}
+    </section>
+    {% endif %}
+
+{% endblock content %}

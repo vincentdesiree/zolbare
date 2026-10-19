@@ -1,0 +1,65 @@
+{% component list_article(config, section, page) %}
+
+{% set date_format = config.extra.date_format | default(value="%Y-%m-%d") %}
+
+{% set show_authors = section.extra.show_authors | default(value=config.extra.show_authors) | default(value=trus) %}
+{% set show_dates = section.extra.show_dates | default(value=config.extra.show_dates) | default(value=true) %}
+{% set show_description = section.extra.show_description | default(value=config.extra.show_description) | default(value=true) %}
+{% set show_series = section.extra.show_series | default(value=config.extra.show_series) | default(value=true) %}
+{% set show_tags = section.extra.show_tags | default(value=config.extra.show_tags) | default(value=true) %}
+
+<article class="list-article">
+    <header>
+        <h2><a href="{{ page.permalink | safe }}">{{ page.title }}</a></h2>
+
+        {% if show_dates and (page.date or page.updated) %}
+        <div class="item-meta-dates">
+            <small>
+                {% if page.date %}
+                <time datetime="{{ page.date }}">{{ page.date | date(format=date_format) }}</time>
+                {% endif %}
+
+                {% if page.updated and page.updated != page.date %}
+                <span class="updated-date">Upd : <time datetime="{{ page.updated }}">{{ page.updated | date(format=date_format) }}</time></span>
+                {% endif %}
+            </small>
+        </div>
+        {% endif %}
+    </header>
+
+    {% if show_description and page.description %}
+    <p class="description">{{ page.description }}</p>
+    {% endif %}
+
+    {% set has_authors = show_authors and ((page.authors | length) > 0 or config.author) %}
+    {% set has_series = show_series and page.taxonomies and page.taxonomies.series %}
+    {% set has_tags = show_tags and page.taxonomies and page.taxonomies.tags %}
+
+    {% if has_authors or has_series or has_tags %}
+    <footer class="item-meta-footer">
+        {% if has_authors and (page.authors | length) > 0 %}
+            <span class="author">By {{ page.authors | join(sep=", ") }}</span>
+        {% elif has_authors and config.author %}
+            <span class="author">By {{ config.author }}</span>
+        {% endif %}
+
+        {% if has_tags %}
+            <ul class="tags">
+                {% for tag in page.taxonomies.tags %}
+                    <li><a href="{{ get_taxonomy_url(kind="tags", name=tag) }}" class="tag">#{{ tag }}</a></li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+
+        {% if has_series %}
+            <div class="series">
+                Serie :
+                {% for s in page.taxonomies.series %}
+                    <a href="{{ get_taxonomy_url(kind="series", name=s) }}">{{ s }}</a>{% if not loop.last %}, {% endif %}
+                {% endfor %}
+            </div>
+        {% endif %}
+    </footer>
+    {% endif %}
+</article>
+{% endcomponent list_article %}
