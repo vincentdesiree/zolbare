@@ -29,7 +29,7 @@ You can control which metadata appears on individual pages and sections using th
 
 | Option | Sections | Pages |
 | :--- | :---: | :---: |
-| `show_author` | ✅ | ✅ |
+| `show_authors` | ✅ | ✅ |
 | `show_dates` | ✅ | ✅ |
 | `show_reading_time` | | ✅ |
 | `show_description` | ✅ | |
@@ -41,7 +41,7 @@ For example, to hide the author and dates on a specific page:
 
 ```toml
 [extra]
-show_author = false
+show_authors = false
 show_dates = false
 ```
 

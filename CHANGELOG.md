@@ -14,4 +14,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Responsive 0-JS navigation via native `<details>` and `<summary>`.
 - Sticky desktop Table of Contents (TOC) and modular sidebar widgets support.
 - Native CSS variables (`:root`) with automatic `prefers-color-scheme` dark mode.
-- Granular metadata visibility toggles (`show_author`, `show_dates`, `show_toc`, etc.).
+- Granular metadata visibility toggles (`show_authors`, `show_dates`, `show_toc`, etc.).
